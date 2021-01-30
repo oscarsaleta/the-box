@@ -4,12 +4,12 @@ import random
 from typing import List, Tuple
 
 import pandas as pd
+import plac
 
 logger = logging.getLogger("the-box")
 
 BOX_ITEM_EXPIRATION = 4
 HARDCORE_START = 15
-BOX_ITEMS = 100
 
 
 class Player:
@@ -75,11 +75,11 @@ class TheBox:
     house_items: List[str]
     box_items: List[str]
 
-    def __init__(self):
+    def __init__(self, box_items: int):
         self.path = pathlib.Path(__file__).parent.absolute()
 
         self.house_items = self._read_house_items()
-        self.box_items = self._read_box_items()
+        self.box_items = [i + 1 for i in range(box_items)]
 
         self.players = [Player(name=name, starting_items=self.house_items) for name in self._read_players()]
 
@@ -89,10 +89,6 @@ class TheBox:
         """Read house items list"""
         house_items_file = self.path / "house-objects.csv"
         return pd.read_csv(house_items_file, header=None)[0].to_list()
-
-    def _read_box_items(self) -> List[str]:
-        """Read Box items list"""
-        return [i + 1 for i in range(BOX_ITEMS)]
 
     def _read_players(self) -> List[str]:
         """Read players list"""
@@ -160,10 +156,11 @@ class TheBox:
             self.one_day(hardcore=True)
 
 
-def main():
-    game = TheBox()
+@plac.annotations(box_items=plac.Annotation(help="Number of items in the box", type=int))
+def main(box_items: int):
+    game = TheBox(box_items=box_items)
     game.play()
 
 
 if __name__ == "__main__":
-    main()
+    plac.call(main)
