@@ -9,6 +9,7 @@ logger = logging.getLogger("the-box")
 
 BOX_ITEM_EXPIRATION = 4
 HARDCORE_START = 15
+BOX_ITEMS = 100
 
 
 class Player:
@@ -91,8 +92,7 @@ class TheBox:
 
     def _read_box_items(self) -> List[str]:
         """Read Box items list"""
-        box_items_file = self.path / "box-objects.csv"
-        return pd.read_csv(box_items_file, header=None)[0].to_list()
+        return [i + 1 for i in range(BOX_ITEMS)]
 
     def _read_players(self) -> List[str]:
         """Read players list"""
@@ -109,8 +109,8 @@ class TheBox:
         return result
 
     def one_day(self, hardcore: bool = False):
-        print("----------")
-        print(f"It's day {self.turn}!")
+        print("\n==========================")
+        print(f"DAY {self.turn}")
         # 5 PM
         print("It's 5 PM!")
         if not hardcore:
@@ -145,15 +145,16 @@ class TheBox:
         loser.lose_random_house_item()
 
     def play(self):
-        print(f"WELCOME TO THE BOX")
+        print(f"\nWELCOME TO THE BOX")
         print(
             f"Today's players are: {', '.join([player.name for player in self.players])}."
             " Who will be the last one standing?"
         )
-        print(f"Let the game begin! May The Box be with you!")
+        print(f"Let the game begin! May The Box be with you!\n")
         for turn in range(1, HARDCORE_START):
             self.turn = turn
             self.one_day()
+            input("\nPress enter to advance to the next day!")
         while self.turn >= HARDCORE_START:
             self.turn += 1
             self.one_day(hardcore=True)
